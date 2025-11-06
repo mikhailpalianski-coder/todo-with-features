@@ -30,8 +30,7 @@ services:
       - ./server/tsconfig.json:/app/tsconfig.json
       - ./server/tsconfig.build.json:/app/tsconfig.build.json
       - ./server/nest-cli.json:/app/nest-cli.json
-      # Use named volume for node_modules to avoid conflicts
-      - server_node_modules:/app/node_modules
+      # Note: node_modules are not mounted to use the ones installed in the container
     depends_on:
       - mongodb
     networks:
@@ -40,7 +39,6 @@ services:
 
 volumes:
   mongodb_data:
-  server_node_modules:
 
 networks:
   app-network:
