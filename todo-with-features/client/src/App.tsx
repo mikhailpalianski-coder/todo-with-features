@@ -9,7 +9,10 @@ interface Todo {
   updatedAt?: string;
 }
 
-const API_URL = 'http://localhost:3000/todos';
+
+const API_URL = import.meta.env.PROD 
+  ? '/api/todos' 
+  : 'http://localhost:3000/todos';
 
 function App() {
   const [todos, setTodos] = useState<Todo[]>([])
