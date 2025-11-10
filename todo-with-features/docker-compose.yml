@@ -12,26 +12,63 @@ services:
     networks:
       - app-network
 
-  server:
+  # Server instance 1 (primary - handles most traffic)
+  server1:
     build:
       context: ./server
       dockerfile: Dockerfile.dev
-    container_name: server
-    # Port exposed for direct access during development (optional)
-    # ports:
-    #   - "3000:3000"
+    container_name: server1
     environment:
       - NODE_ENV=development
       - MONGODB_URI=mongodb://admin:password@mongodb:27017/todo?authSource=admin
     volumes:
-      # Mount source code for hot-reload
       - ./server/src:/app/src
       - ./server/test:/app/test
-      # Mount config files (may need container restart if changed)
       - ./server/tsconfig.json:/app/tsconfig.json
       - ./server/tsconfig.build.json:/app/tsconfig.build.json
       - ./server/nest-cli.json:/app/nest-cli.json
-      # Note: node_modules are not mounted to use the ones installed in the container
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # Server instance 2 (secondary - handles moderate traffic)
+  server2:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    container_name: server2
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://admin:password@mongodb:27017/todo?authSource=admin
+    volumes:
+      - ./server/src:/app/src
+      - ./server/test:/app/test
+      - ./server/tsconfig.json:/app/tsconfig.json
+      - ./server/tsconfig.build.json:/app/tsconfig.build.json
+      - ./server/nest-cli.json:/app/nest-cli.json
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # Server instance 3 (backup - only used if others fail)
+  server3:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    container_name: server3
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://admin:password@mongodb:27017/todo?authSource=admin
+    volumes:
+      - ./server/src:/app/src
+      - ./server/test:/app/test
+      - ./server/tsconfig.json:/app/tsconfig.json
+      - ./server/tsconfig.build.json:/app/tsconfig.build.json
+      - ./server/nest-cli.json:/app/nest-cli.json
     depends_on:
       - mongodb
     networks:
@@ -44,7 +81,7 @@ services:
       dockerfile: Dockerfile
     container_name: client
     depends_on:
-      - server
+      - server1
     networks:
       - app-network
     restart: unless-stopped
@@ -57,7 +94,9 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
-      - server
+      - server1
+      - server2
+      - server3
       - client
     networks:
       - app-network
