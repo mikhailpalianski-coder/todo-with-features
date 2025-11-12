@@ -1,9 +1,8 @@
 services:
-  # Backend API Service
+  # Backend API Service (Free Tier)
   - type: web
     name: todo-api
     env: node
-    plan: starter
     rootDir: server
     buildCommand: npm install -g pnpm && pnpm install --frozen-lockfile && pnpm run build
     startCommand: pnpm run start:prod
@@ -13,14 +12,12 @@ services:
       - key: PORT
         value: 3000
       - key: MONGODB_URI
-        fromDatabase:
-          name: todo-mongodb
-          property: connectionString
+        sync: false  
       - key: CORS_ORIGIN
         sync: false 
     healthCheckPath: /
     
-  # Frontend Web Service
+  # Frontend Web Service (Free - Static sites are free by default)
   - type: web
     name: todo-frontend
     env: static
@@ -30,10 +27,4 @@ services:
     envVars:
       - key: VITE_API_URL
         sync: false  
-
-databases:
-  - name: todo-mongodb
-    plan: starter
-    databaseName: todo
-    user: admin
 
