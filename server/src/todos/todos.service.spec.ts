@@ -59,18 +59,17 @@ describe('TodosService', () => {
   describe('create', () => {
     it('should create a todo', async () => {
       const createTodoDto: CreateTodoDto = { content: 'Test todo' };
-      const saveMock = jest.fn().mockResolvedValue(mockTodo);
-      
-      // Update the mock constructor to return an object with our save mock
-      MockModelConstructor.mockImplementation(() => ({
-        save: saveMock,
-      }));
+      const mockDocument = {
+        ...mockTodo,
+        toObject: jest.fn().mockReturnValue(mockTodo),
+      };
+      // Mock the create method
+      jest.spyOn(model, 'create').mockResolvedValue(mockDocument as never);
 
       const result = await service.create(createTodoDto);
-      
       expect(result).toEqual(mockTodo);
-      expect(saveMock).toHaveBeenCalled();
-      expect(MockModelConstructor).toHaveBeenCalledWith(createTodoDto);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(model.create).toHaveBeenCalledWith(createTodoDto);
     });
   });
 

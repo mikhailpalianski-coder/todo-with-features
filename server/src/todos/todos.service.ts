@@ -10,8 +10,8 @@ export class TodosService {
   constructor(@InjectModel(Todo.name) private todoModel: Model<TodoDocument>) {}
 
   async create(createTodoDto: CreateTodoDto): Promise<Todo> {
-    const createdTodo = new this.todoModel(createTodoDto);
-    return createdTodo.save();
+    const createdTodo = await this.todoModel.create(createTodoDto);
+    return createdTodo.toObject() as Todo;
   }
 
   async findAll(): Promise<Todo[]> {
