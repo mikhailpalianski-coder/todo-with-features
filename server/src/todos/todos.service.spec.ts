@@ -19,17 +19,19 @@ describe('TodosService', () => {
     updatedAt: new Date(),
   };
 
-  const mockTodoModel = {
-    new: jest.fn().mockResolvedValue(mockTodo),
-    constructor: jest.fn().mockResolvedValue(mockTodo),
+  // Create a mock constructor function that can be called with 'new'
+  const MockModelConstructor = jest.fn().mockImplementation(() => ({
+    save: jest.fn().mockResolvedValue(mockTodo),
+  }));
+
+  // Add mongoose model static methods
+  const mockTodoModel = Object.assign(MockModelConstructor, {
     find: jest.fn(),
     findById: jest.fn(),
     findByIdAndUpdate: jest.fn(),
     findByIdAndDelete: jest.fn(),
     create: jest.fn(),
-    save: jest.fn(),
-    exec: jest.fn(),
-  };
+  });
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -59,15 +61,16 @@ describe('TodosService', () => {
       const createTodoDto: CreateTodoDto = { content: 'Test todo' };
       const saveMock = jest.fn().mockResolvedValue(mockTodo);
       
-      // Mock the model constructor to return an object with a save method
-      (model as unknown as { new: jest.Mock }).new = jest.fn().mockReturnValue({
+      // Update the mock constructor to return an object with our save mock
+      MockModelConstructor.mockImplementation(() => ({
         save: saveMock,
-      });
+      }));
 
       const result = await service.create(createTodoDto);
       
       expect(result).toEqual(mockTodo);
       expect(saveMock).toHaveBeenCalled();
+      expect(MockModelConstructor).toHaveBeenCalledWith(createTodoDto);
     });
   });
 
