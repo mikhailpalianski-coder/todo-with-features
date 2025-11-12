@@ -56,7 +56,8 @@ describe('TodosController', () => {
       const result = await controller.create(createTodoDto);
 
       expect(result).toEqual(mockTodo);
-      expect(service.create).toHaveBeenCalledWith(createTodoDto);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockTodosService.create).toHaveBeenCalledWith(createTodoDto);
     });
   });
 
@@ -68,7 +69,8 @@ describe('TodosController', () => {
       const result = await controller.findAll();
 
       expect(result).toEqual(todos);
-      expect(service.findAll).toHaveBeenCalled();
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockTodosService.findAll).toHaveBeenCalled();
     });
   });
 
@@ -79,7 +81,8 @@ describe('TodosController', () => {
       const result = await controller.findOne(mockTodo._id);
 
       expect(result).toEqual(mockTodo);
-      expect(service.findOne).toHaveBeenCalledWith(mockTodo._id);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockTodosService.findOne).toHaveBeenCalledWith(mockTodo._id);
     });
 
     it('should throw NotFoundException when todo not found', async () => {
@@ -102,7 +105,8 @@ describe('TodosController', () => {
       const result = await controller.update(mockTodo._id, updateDto);
 
       expect(result).toEqual(updatedTodo);
-      expect(service.update).toHaveBeenCalledWith(mockTodo._id, updateDto);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockTodosService.update).toHaveBeenCalledWith(mockTodo._id, updateDto);
     });
   });
 
@@ -113,7 +117,8 @@ describe('TodosController', () => {
       const result = await controller.remove(mockTodo._id);
 
       expect(result).toEqual(mockTodo);
-      expect(service.remove).toHaveBeenCalledWith(mockTodo._id);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockTodosService.remove).toHaveBeenCalledWith(mockTodo._id);
     });
   });
 });

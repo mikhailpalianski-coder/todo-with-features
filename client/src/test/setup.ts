@@ -2,19 +2,14 @@ import '@testing-library/jest-dom';
 import { afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 
-// Type definitions for global in test environment
-declare global {
-  // eslint-disable-next-line no-var
-  var fetch: ReturnType<typeof vi.fn>;
-}
-
 // Cleanup after each test
 afterEach(() => {
   cleanup();
 });
 
 // Mock window.fetch globally
-globalThis.fetch = vi.fn() as never;
+// fetch is already defined in DOM types, so we just override it
+globalThis.fetch = vi.fn() as typeof fetch;
 
 // Mock IntersectionObserver
 globalThis.IntersectionObserver = class IntersectionObserver {

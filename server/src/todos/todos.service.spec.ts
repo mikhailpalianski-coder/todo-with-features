@@ -59,22 +59,25 @@ describe('TodosService', () => {
       const createTodoDto: CreateTodoDto = { content: 'Test todo' };
       const saveMock = jest.fn().mockResolvedValue(mockTodo);
       
-      jest.spyOn(model, 'create').mockImplementation(() => ({
+      // Mock the model constructor to return an object with a save method
+      (model as unknown as { new: jest.Mock }).new = jest.fn().mockReturnValue({
         save: saveMock,
-      } as any));
+      });
 
       const result = await service.create(createTodoDto);
       
       expect(result).toEqual(mockTodo);
+      expect(saveMock).toHaveBeenCalled();
     });
   });
 
   describe('findAll', () => {
     it('should return an array of todos', async () => {
       const todos = [mockTodo];
+      const execMock = jest.fn().mockResolvedValue(todos);
       jest.spyOn(model, 'find').mockReturnValue({
-        exec: jest.fn().mockResolvedValue(todos),
-      } as any);
+        exec: execMock,
+      } as never);
 
       const result = await service.findAll();
       
@@ -83,9 +86,10 @@ describe('TodosService', () => {
     });
 
     it('should return empty array when no todos exist', async () => {
+      const execMock = jest.fn().mockResolvedValue([]);
       jest.spyOn(model, 'find').mockReturnValue({
-        exec: jest.fn().mockResolvedValue([]),
-      } as any);
+        exec: execMock,
+      } as never);
 
       const result = await service.findAll();
       
@@ -95,9 +99,10 @@ describe('TodosService', () => {
 
   describe('findOne', () => {
     it('should return a todo by id', async () => {
+      const execMock = jest.fn().mockResolvedValue(mockTodo);
       jest.spyOn(model, 'findById').mockReturnValue({
-        exec: jest.fn().mockResolvedValue(mockTodo),
-      } as any);
+        exec: execMock,
+      } as never);
 
       const result = await service.findOne(mockTodo._id);
       
@@ -106,9 +111,10 @@ describe('TodosService', () => {
     });
 
     it('should throw NotFoundException when todo not found', async () => {
+      const execMock = jest.fn().mockResolvedValue(null);
       jest.spyOn(model, 'findById').mockReturnValue({
-        exec: jest.fn().mockResolvedValue(null),
-      } as any);
+        exec: execMock,
+      } as never);
 
       await expect(service.findOne('invalid-id')).rejects.toThrow(
         NotFoundException,
@@ -120,10 +126,11 @@ describe('TodosService', () => {
     it('should update a todo', async () => {
       const updateDto: UpdateTodoDto = { completed: true };
       const updatedTodo = { ...mockTodo, completed: true };
+      const execMock = jest.fn().mockResolvedValue(updatedTodo);
       
       jest.spyOn(model, 'findByIdAndUpdate').mockReturnValue({
-        exec: jest.fn().mockResolvedValue(updatedTodo),
-      } as any);
+        exec: execMock,
+      } as never);
 
       const result = await service.update(mockTodo._id, updateDto);
       
@@ -137,10 +144,11 @@ describe('TodosService', () => {
 
     it('should throw NotFoundException when todo not found', async () => {
       const updateDto: UpdateTodoDto = { completed: true };
+      const execMock = jest.fn().mockResolvedValue(null);
       
       jest.spyOn(model, 'findByIdAndUpdate').mockReturnValue({
-        exec: jest.fn().mockResolvedValue(null),
-      } as any);
+        exec: execMock,
+      } as never);
 
       await expect(service.update('invalid-id', updateDto)).rejects.toThrow(
         NotFoundException,
@@ -150,9 +158,10 @@ describe('TodosService', () => {
 
   describe('remove', () => {
     it('should delete a todo', async () => {
+      const execMock = jest.fn().mockResolvedValue(mockTodo);
       jest.spyOn(model, 'findByIdAndDelete').mockReturnValue({
-        exec: jest.fn().mockResolvedValue(mockTodo),
-      } as any);
+        exec: execMock,
+      } as never);
 
       const result = await service.remove(mockTodo._id);
       
@@ -161,9 +170,10 @@ describe('TodosService', () => {
     });
 
     it('should throw NotFoundException when todo not found', async () => {
+      const execMock = jest.fn().mockResolvedValue(null);
       jest.spyOn(model, 'findByIdAndDelete').mockReturnValue({
-        exec: jest.fn().mockResolvedValue(null),
-      } as any);
+        exec: execMock,
+      } as never);
 
       await expect(service.remove('invalid-id')).rejects.toThrow(
         NotFoundException,
