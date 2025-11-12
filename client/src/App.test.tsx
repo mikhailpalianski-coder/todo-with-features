@@ -6,6 +6,12 @@ import App from './App';
 // Mock fetch
 global.fetch = vi.fn();
 
+// Type helper for mocked fetch
+type MockedFetch = ReturnType<typeof vi.fn> & {
+  mockResolvedValueOnce: (value: Response | Promise<Response>) => MockedFetch;
+  mockRejectedValueOnce: (value: unknown) => MockedFetch;
+};
+
 describe('App', () => {
   const mockTodos = [
     {
@@ -25,20 +31,20 @@ describe('App', () => {
   });
 
   it('should render the todo list heading', () => {
-    (global.fetch as any).mockResolvedValueOnce({
+    (global.fetch as MockedFetch).mockResolvedValueOnce({
       ok: true,
       json: async () => [],
-    });
+    } as Response);
 
     render(<App />);
     expect(screen.getByText('Todo List')).toBeInTheDocument();
   });
 
   it('should fetch and display todos', async () => {
-    (global.fetch as any).mockResolvedValueOnce({
+    (global.fetch as MockedFetch).mockResolvedValueOnce({
       ok: true,
       json: async () => mockTodos,
-    });
+    } as Response);
 
     render(<App />);
 
@@ -49,10 +55,10 @@ describe('App', () => {
   });
 
   it('should display empty state when no todos', async () => {
-    (global.fetch as any).mockResolvedValueOnce({
+    (global.fetch as MockedFetch).mockResolvedValueOnce({
       ok: true,
       json: async () => [],
-    });
+    } as Response);
 
     render(<App />);
 
@@ -66,11 +72,11 @@ describe('App', () => {
   it('should create a new todo', async () => {
     const user = userEvent.setup();
 
-    (global.fetch as any)
+    (global.fetch as MockedFetch)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => [],
-      })
+      } as Response)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -78,7 +84,7 @@ describe('App', () => {
           content: 'New Todo',
           completed: false,
         }),
-      });
+      } as Response);
 
     render(<App />);
 
@@ -102,18 +108,18 @@ describe('App', () => {
   it('should toggle todo completion', async () => {
     const user = userEvent.setup();
 
-    (global.fetch as any)
+    (global.fetch as MockedFetch)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => mockTodos,
-      })
+      } as Response)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           ...mockTodos[0],
           completed: true,
         }),
-      });
+      } as Response);
 
     render(<App />);
 
@@ -139,14 +145,14 @@ describe('App', () => {
   it('should delete a todo', async () => {
     const user = userEvent.setup();
 
-    (global.fetch as any)
+    (global.fetch as MockedFetch)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => mockTodos,
-      })
+      } as Response)
       .mockResolvedValueOnce({
         ok: true,
-      });
+      } as Response);
 
     render(<App />);
 
@@ -168,7 +174,7 @@ describe('App', () => {
   });
 
   it('should display error message on fetch failure', async () => {
-    (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
+    (global.fetch as MockedFetch).mockRejectedValueOnce(new Error('Network error'));
 
     render(<App />);
 
