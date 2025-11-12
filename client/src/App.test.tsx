@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import App from './App';
 
 // Mock fetch
-global.fetch = vi.fn();
+globalThis.fetch = vi.fn() as never;
 
 // Type helper for mocked fetch
 type MockedFetch = ReturnType<typeof vi.fn> & {
@@ -31,7 +31,7 @@ describe('App', () => {
   });
 
   it('should render the todo list heading', () => {
-    (global.fetch as MockedFetch).mockResolvedValueOnce({
+    (globalThis.fetch as MockedFetch).mockResolvedValueOnce({
       ok: true,
       json: async () => [],
     } as Response);
@@ -41,7 +41,7 @@ describe('App', () => {
   });
 
   it('should fetch and display todos', async () => {
-    (global.fetch as MockedFetch).mockResolvedValueOnce({
+    (globalThis.fetch as MockedFetch).mockResolvedValueOnce({
       ok: true,
       json: async () => mockTodos,
     } as Response);
@@ -55,7 +55,7 @@ describe('App', () => {
   });
 
   it('should display empty state when no todos', async () => {
-    (global.fetch as MockedFetch).mockResolvedValueOnce({
+    (globalThis.fetch as MockedFetch).mockResolvedValueOnce({
       ok: true,
       json: async () => [],
     } as Response);
@@ -72,7 +72,7 @@ describe('App', () => {
   it('should create a new todo', async () => {
     const user = userEvent.setup();
 
-    (global.fetch as MockedFetch)
+    (globalThis.fetch as MockedFetch)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => [],
@@ -95,7 +95,7 @@ describe('App', () => {
     await user.click(addButton);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(globalThis.fetch).toHaveBeenCalledWith(
         expect.stringContaining('/todos'),
         expect.objectContaining({
           method: 'POST',
@@ -108,7 +108,7 @@ describe('App', () => {
   it('should toggle todo completion', async () => {
     const user = userEvent.setup();
 
-    (global.fetch as MockedFetch)
+    (globalThis.fetch as MockedFetch)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => mockTodos,
@@ -133,7 +133,7 @@ describe('App', () => {
     await user.click(toggleButtons[0]);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(globalThis.fetch).toHaveBeenCalledWith(
         expect.stringContaining('/todos/1'),
         expect.objectContaining({
           method: 'PATCH',
@@ -145,7 +145,7 @@ describe('App', () => {
   it('should delete a todo', async () => {
     const user = userEvent.setup();
 
-    (global.fetch as MockedFetch)
+    (globalThis.fetch as MockedFetch)
       .mockResolvedValueOnce({
         ok: true,
         json: async () => mockTodos,
@@ -164,7 +164,7 @@ describe('App', () => {
     await user.click(deleteButtons[0]);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(globalThis.fetch).toHaveBeenCalledWith(
         expect.stringContaining('/todos/1'),
         expect.objectContaining({
           method: 'DELETE',
@@ -174,7 +174,7 @@ describe('App', () => {
   });
 
   it('should display error message on fetch failure', async () => {
-    (global.fetch as MockedFetch).mockRejectedValueOnce(new Error('Network error'));
+    (globalThis.fetch as MockedFetch).mockRejectedValueOnce(new Error('Network error'));
 
     render(<App />);
 
