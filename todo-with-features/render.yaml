@@ -1,0 +1,39 @@
+services:
+  # Backend API Service
+  - type: web
+    name: todo-api
+    env: node
+    plan: starter
+    rootDir: server
+    buildCommand: npm install -g pnpm && pnpm install --frozen-lockfile && pnpm run build
+    startCommand: pnpm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: MONGODB_URI
+        fromDatabase:
+          name: todo-mongodb
+          property: connectionString
+      - key: CORS_ORIGIN
+        sync: false 
+    healthCheckPath: /
+    
+  # Frontend Web Service
+  - type: web
+    name: todo-frontend
+    env: static
+    buildCommand: npm install -g pnpm && cd client && pnpm install --frozen-lockfile && pnpm run build
+    staticPublishPath: client/dist
+    pullRequestPreviewsEnabled: false
+    envVars:
+      - key: VITE_API_URL
+        sync: false  
+
+databases:
+  - name: todo-mongodb
+    plan: starter
+    databaseName: todo
+    user: admin
+

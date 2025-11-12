@@ -10,9 +10,11 @@ interface Todo {
 }
 
 
-const API_URL = import.meta.env.PROD 
-  ? '/api/todos' 
-  : 'http://localhost:3000/todos';
+const API_URL = import.meta.env.VITE_API_URL 
+  ? `${import.meta.env.VITE_API_URL}/todos`
+  : import.meta.env.PROD 
+    ? '/api/todos' 
+    : 'http://localhost:3000/todos';
 
 function App() {
   const [todos, setTodos] = useState<Todo[]>([])
