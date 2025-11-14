@@ -1,0 +1,38 @@
+# SSL Certificates (should not be committed)
+ssl/
+*.pem
+*.key
+*.crt
+*.cert
+
+# Environment variables
+.env
+.env.local
+
+# Node modules
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker volumes
+*.data/
+
